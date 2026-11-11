@@ -1,0 +1,41 @@
+
+name: WAS AI Photo Maker APK Build
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download project files
+        uses: actions/checkout@v4
+
+      - name: Install Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Extract Android project
+        run: |
+          unzip -q WAS_Ai_Photo_Maker_Android_Source_v1.zip -d /tmp/was-source
+
+      - name: Build Android APK
+        run: |
+          cd /tmp/was-source/WAS_Ai_Photo_Maker_Android_Project
+          gradle assembleDebug
+
+      - name: Save APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: WAS-Ai-Photo-Maker-APK
+          path: /tmp/was-source/WAS_Ai_Photo_Maker_Android_Project/app/build/outputs/apk/debug/*.apk
